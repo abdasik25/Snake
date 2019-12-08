@@ -1,4 +1,4 @@
-package com.example.lab4;
+package com.example.snake;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -15,16 +15,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements IGameManager {
+
+/**
+ * The type Main activity.
+ */
+public class MainActivity extends AppCompatActivity implements SnakeBehavior {
 
     private Context context;
 
     private float dx, dy;
 
-    private ArrayList<View> applesList;
-    private ArrayList<View> trashList;
+    private List<View> fruits;
+    private List<View> trash;
 
     private TextView appleCounterText;
     private int appleCounter;
@@ -36,12 +41,9 @@ public class MainActivity extends AppCompatActivity implements IGameManager {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        applesList = new ArrayList<>();
-        trashList = new ArrayList<>();
-
+        fruits = new LinkedList<>();
+        trash = new LinkedList<>();
         context = this;
-
-
         final Button restartButton = findViewById(R.id.restartButton);
 
         restartButton.setOnTouchListener(new View.OnTouchListener() {
@@ -49,14 +51,15 @@ public class MainActivity extends AppCompatActivity implements IGameManager {
             public boolean onTouch(View v, MotionEvent event) {
 
                 AnimatorSet set;
+
                 switch (event.getAction()) {
+
                     case MotionEvent.ACTION_DOWN:
 
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(context,
                                 R.animator.restart_button_pressed);
                         set.setTarget(restartButton);
                         set.start();
-
                         break;
                     case MotionEvent.ACTION_UP:
                         set = (AnimatorSet) AnimatorInflater.loadAnimator(context,
@@ -76,45 +79,44 @@ public class MainActivity extends AppCompatActivity implements IGameManager {
             }
         });
 
-
         appleCounterText = findViewById(R.id.appleCounter);
     }
 
 
     @Override
-    public void addToAppleList(View view) {
-        applesList.add(view);
+    public void addToFruitList(View view) {
+        fruits.add(view);
     }
 
     @Override
-    public ArrayList<View> getApplesList() {
-        return applesList;
+    public List<View> getFruits() {
+        return fruits;
     }
 
     @Override
-    public void CollectApple(final View apple) {
+    public void CollectFruit(final View apple) {
 
         appleCounter++;
         appleCounterText.setText(String.valueOf(appleCounter));
         apple.setAlpha(0);
 
-        if (applesList.size() == 0)
+        if (fruits.size() == 0)
             Toast.makeText(this, "You win!", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void addToTrashList(View view) {
-        trashList.add(view);
+        trash.add(view);
     }
 
     @Override
-    public ArrayList<View> getTrashList() {
-        return trashList;
+    public List<View> getTrash() {
+        return trash;
     }
 
     @Override
     public void removeTrash(final View view) {
-        trashList.remove(view);
+        trash.remove(view);
         view.setAlpha(0);
     }
 }

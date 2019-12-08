@@ -1,4 +1,4 @@
-package com.example.lab4;
+package com.example.snake;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,16 +13,25 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+/**
+ * The type Trash.
+ */
 public class Trash extends ImageView {
     private VelocityTracker tracker;
     private float dx;
     private float startX;
     private float xThreshold = 100;
 
-    private IGameManager gameManager;
+    private SnakeBehavior gameManager;
 
     private View thisView;
 
+    /**
+     * Instantiates a new Trash.
+     *
+     * @param context the context
+     * @param attrs   the attrs
+     */
     public Trash(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -34,7 +43,7 @@ public class Trash extends ImageView {
         if (isInEditMode())
             return;
 
-        gameManager = ((IGameManager) context);
+        gameManager = ((SnakeBehavior) context);
         this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -76,7 +85,8 @@ public class Trash extends ImageView {
                 tracker.computeCurrentVelocity(1);
                 if (Math.abs(tracker.getXVelocity() / tracker.getYVelocity()) > 2 && Math.abs(tracker.getXVelocity()) > 2) {
                     Toast.makeText(getContext(), "Swipe!", Toast.LENGTH_SHORT).show();
-                    animate().translationXBy(Math.signum(tracker.getXVelocity()) * 1000).setDuration(700).setListener(new AnimatorListenerAdapter() {
+                    animate().translationXBy(Math.signum(tracker.getXVelocity())
+                            * 1000).setDuration(700).setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             gameManager.removeTrash(thisView);

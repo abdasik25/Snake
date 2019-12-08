@@ -1,4 +1,4 @@
-package com.example.lab4;
+package com.example.snake;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,12 +14,21 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
+/**
+ * The type Snake.
+ */
 public class Snake extends View {
+
     private int speed = 10;
     private Paint paint;
-    private int startBodyCount = 3;
+    private int startBodyCount = 1;
+
+    private int currentColor = Color.BLACK;
+    private static int STEPS_COUNT = 7;
+
 
     private PointF startPosition;
     private int radius = 20;
@@ -27,17 +36,23 @@ public class Snake extends View {
     private float desiredX, desiredY;
     private boolean isMoving;
 
-    private IGameManager gameManager;
+    private SnakeBehavior gameManager;
 
     private float dx, dy;
 
     private ArrayList<SnakeBodyCell> bodyCells;
 
+    /**
+     * Instantiates a new Snake.
+     *
+     * @param context the context
+     * @param attrs   the attrs
+     */
     public Snake(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         paint = new Paint();
-        paint.setColor(Color.GREEN);
+        paint.setColor(currentColor);
 
         startPosition = new PointF(500, 500);
 
@@ -52,7 +67,7 @@ public class Snake extends View {
         if (isInEditMode())
             return;
 
-        gameManager = ((IGameManager) context);
+        gameManager = ((SnakeBehavior) context);
     }
 
     @Override
@@ -84,6 +99,12 @@ public class Snake extends View {
         }
     }
 
+    /**
+     * Move to.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void moveTo(float x, float y) {
         float dx = x - bodyCells.get(0).getPos().x;
         float dy = y - bodyCells.get(0).getPos().y;
@@ -135,7 +156,7 @@ public class Snake extends View {
     }
 
     private boolean trashCollision() {
-        ArrayList<View> trashList = gameManager.getTrashList();
+        List<View> trashList = gameManager.getTrash();
         Rect trashRect = new Rect();
 
         PointF head = bodyCells.get(0).getPos();
@@ -152,7 +173,7 @@ public class Snake extends View {
     }
 
     private void checkAppleCollision() {
-        ArrayList<View> appleList = gameManager.getApplesList();
+        List<View> appleList = gameManager.getFruits();
         View apple;
 
         PointF head = bodyCells.get(0).getPos();
@@ -166,7 +187,9 @@ public class Snake extends View {
             apple.getGlobalVisibleRect(appleRect);
             if (appleRect.intersect(thisRect)) {
                 it.remove();
-                gameManager.CollectApple(apple);
+                gameManager.CollectFruit(apple);
+                STEPS_COUNT--;
+                paint.setColor(ColorUtils.getColor((float) (1. / STEPS_COUNT)));
                 PointF tail = bodyCells.get(bodyCells.size() - 1).getPos();
                 bodyCells.add(new SnakeBodyCell(tail.x, tail.y - radius * 2));
                 return;
@@ -175,14 +198,27 @@ public class Snake extends View {
     }
 
     private class SnakeBodyCell {
+
         private PointF prevPos;
         private PointF pos;
 
+        /**
+         * Instantiates a new Snake body cell.
+         *
+         * @param x the x
+         * @param y the y
+         */
         public SnakeBodyCell(float x, float y) {
             prevPos = new PointF(x, y);
             pos = new PointF(x, y);
         }
 
+        /**
+         * Add to pos.
+         *
+         * @param dx the dx
+         * @param dy the dy
+         */
         public void addToPos(float dx, float dy) {
             prevPos.x = pos.x;
             prevPos.y = pos.y;
@@ -190,6 +226,11 @@ public class Snake extends View {
             pos.offset(dx, dy);
         }
 
+        /**
+         * Gets future rect.
+         *
+         * @return the future rect
+         */
         public Rect getFutureRect() {
             PointF direction = new PointF();
             direction.x = desiredX - pos.x;
@@ -206,10 +247,20 @@ public class Snake extends View {
             return new Rect((int) (futurePos.x - radius + dx), (int) (futurePos.y - radius + dy), (int) (futurePos.x + radius + dx), (int) (futurePos.y + radius + dy));
         }
 
+        /**
+         * Gets pos.
+         *
+         * @return the pos
+         */
         public PointF getPos() {
             return pos;
         }
 
+        /**
+         * Sets pos.
+         *
+         * @param desiredPos the desired pos
+         */
         public void setPos(PointF desiredPos) {
             PointF direction = new PointF();
             direction.x = desiredPos.x - pos.x;
@@ -229,6 +280,11 @@ public class Snake extends View {
 
         }
 
+        /**
+         * Gets prev pos.
+         *
+         * @return the prev pos
+         */
         public PointF getPrevPos() {
             return prevPos;
         }

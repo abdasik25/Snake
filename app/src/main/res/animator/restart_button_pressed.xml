@@ -17,5 +17,4 @@
         android:propertyName="backgroundColor"
         android:valueFrom="#D6D6D6"
         android:valueTo="#BEBEBE" />
-
 </set>
